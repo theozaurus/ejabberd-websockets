@@ -263,8 +263,13 @@ add_header(Name, Value, State) ->
 is_websocket_upgrade(RequestHeaders) ->
     Connection = {'Connection', "Upgrade"} == lists:keyfind('Connection', 1,
                                                             RequestHeaders),
-    Upgrade = {'Upgrade', "WebSocket"} == lists:keyfind('Upgrade', 1,
-                                                        RequestHeaders),
+    UpgradeHeader = lists:keyfind('Upgrade', 1,
+                                  RequestHeaders),
+    Upgrade = case UpgradeHeader of
+                  {'Upgrade', UpgradeName} -> 
+                    "websocket" == string:to_lower(UpgradeName);
+                  _ -> false
+              end,
     Connection and Upgrade.
 
 handshake(State) ->
